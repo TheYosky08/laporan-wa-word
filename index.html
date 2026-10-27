@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gabung Laporan WA ke Word</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--text:#1b2420;--muted:#5d6a63;--line:#dbe2de;--accent:#128c4a;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111614;--card:#1a211e;--text:#e8eeea;--muted:#9aa8a0;--line:#2b352f;--accent:#3ac47a;--on:#08210f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111614;--card:#1a211e;--text:#e8eeea;--muted:#9aa8a0;--line:#2b352f;--accent:#3ac47a;--on:#08210f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 48px}
+h1{font-size:1.5rem;margin:0 0 2px}.sub{color:var(--muted);margin:0 0 18px}
+.cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:16px;align-items:start}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h2{font-size:.9rem;margin:0 0 10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:.82rem;color:var(--muted);margin:8px 0 3px}
+input[type=text],select,textarea{width:100%;font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{min-height:150px;resize:vertical}
+.r2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 13px;border-radius:8px;cursor:pointer}
+button.pri{background:var(--accent);color:var(--on);border-color:var(--accent);font-weight:600}
+button.sm{padding:3px 9px;font-size:.85rem}
+.chk{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.9rem;color:var(--text)}
+.hint{font-size:.82rem;color:var(--muted);margin-top:6px}
+.item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--bg)}
+.ih{display:flex;gap:6px;align-items:center}
+.ih b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.92rem}
+.num{background:var(--accent);color:var(--on);border-radius:6px;padding:0 7px;font-size:.8rem;font-weight:700}
+.item textarea{min-height:120px;margin-top:8px}
+.paperwrap{position:sticky;top:8px}
+.paper{background:#fff;color:#000;border:1px solid var(--line);border-radius:6px;padding:28px 30px;max-height:68vh;overflow:auto;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.paper:empty:before{content:"Pratinjau dokumen akan muncul di sini setelah Anda menambah laporan.";color:#777;font-family:system-ui,sans-serif;font-size:.9rem}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+#msg{margin-top:10px;min-height:1.3em;font-size:.9rem;color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<h1>Gabung Laporan WA ke Word</h1>
+<p class="sub">Tempel laporan dari WhatsApp satu per satu. Semuanya tersusun jadi satu dokumen Word yang rapi.</p>
+<div class="cols">
+<div>
+  <section class="card">
+    <h2>Tempel laporan WA di sini</h2>
+    <textarea id="inp" placeholder="Salin laporan dari WhatsApp, lalu tempel (Ctrl+V) di sini. Laporan otomatis masuk ke dokumen."></textarea>
+    <div class="row">
+      <button class="pri" id="add">Tambah</button>
+      <button id="undo">Batalkan yang terakhir</button>
+      <button id="demo" class="sm">Isi contoh</button>
+    </div>
+    <div class="hint">Tanda WhatsApp otomatis jadi format Word: <b>*tebal*</b>, <i>_miring_</i>, <s>~coret~</s>, <code>```monospace```</code>; <code>- butir</code> jadi bullet, <code>1.</code> jadi nomor, <code>&gt;</code> jadi kutipan.</div>
+    <div class="hint"><b id="cnt2">0</b> laporan sudah masuk ke dokumen.</div>
+  </section>
+  <details class="card">
+    <summary>Pengaturan &amp; daftar laporan (opsional)</summary>
+    <label for="title">Judul</label><input type="text" id="title">
+    <label for="date">Tanggal / keterangan</label><input type="text" id="date">
+    <div class="r2">
+      <div><label for="font">Huruf</label><select id="font"><option>Calibri</option><option>Arial</option><option>Times New Roman</option><option>Cambria</option></select></div>
+      <div><label for="size">Ukuran</label><select id="size"><option>10</option><option>11</option><option selected>11.5</option><option>12</option></select></div>
+      <div><label for="gap">Jarak</label><select id="gap"><option value="rapat">Rapat</option><option value="normal">Normal</option><option value="longgar">Longgar</option></select></div>
+    </div>
+    <label for="sep">Jarak antar laporan (baris kosong)</label><select id="sep"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+    <label class="chk"><input type="checkbox" id="pb"> Setiap laporan mulai di halaman baru</label>
+    <h2 style="margin-top:16px">Daftar laporan (<span id="cnt">0</span>)</h2>
+    <div id="list"></div>
+    <div class="row"><button id="clr">Kosongkan semua</button></div>
+  </details>
+</div>
+<div class="paperwrap">
+  <section class="card">
+    <h2>Hasil dokumen</h2>
+    <div class="paper" id="paper"></div>
+    <div class="row">
+      <button class="pri" id="dl">Unduh .docx</button>
+      <button id="cp">Salin untuk ditempel di Word</button>
+    </div>
+    <div id="msg" role="status"></div>
+  </section>
+</div>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function(){
+var KEY='wa2word.v2',$=function(i){return document.getElementById(i);};
+var S={title:'LAPORAN HARIAN',sub:new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),font:'Arial',size:'11.5',gap:'rapat',sep:3,pb:false,reports:[]};
+try{var sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv&&sv.reports){S=sv;S.sub=S.sub||'';if(S.font==='Calibri'&&S.size==='11'){S.font='Arial';S.size='11.5';}if(!S.sep)S.sep=3;}}catch(e){}
+var editing={},GAPS={rapat:{after:0,blank:100,line:240},normal:{after:60,blank:160,line:259},longgar:{after:120,blank:240,line:276}};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function inline(s){var k=[],M='<span style="font-family:Consolas,\'Courier New\',monospace">';
+ s=s.replace(/```([\s\S]*?)```/g,function(_,c){k.push(M+c+'</span>');return '\u0001'+(k.length-1)+'\u0002';});
+ s=s.replace(/`([^`\n]+)`/g,function(_,c){k.push(M+c+'</span>');return '\u0001'+(k.length-1)+'\u0002';});
+ s=s.replace(/(?<![A-Za-z0-9*])\*(?=[^\s*])([^*\n]*?[^\s*])\*(?![A-Za-z0-9*])/g,'<b>$1</b>');
+ s=s.replace(/(?<![A-Za-z0-9_])_(?=[^\s_])([^_\n]*?[^\s_])_(?![A-Za-z0-9_])/g,'<i>$1</i>');
+ s=s.replace(/(?<![A-Za-z0-9~])~(?=[^\s~])([^~\n]*?[^\s~])~(?![A-Za-z0-9~])/g,'<s>$1</s>');
+ return s.replace(/\u0001(\d+)\u0002/g,function(_,i){return k[+i];});}
+function parse(t){var o=[];esc(t.replace(/\r/g,'')).split('\n').forEach(function(l){var m;
+ if((m=l.match(/^\s*[-*•]\s+(.*)$/)))o.push({k:'ul',h:inline(m[1])});
+ else if((m=l.match(/^\s*\d+[.)]\s+(.*)$/)))o.push({k:'ol',h:inline(m[1])});
+ else if((m=l.match(/^&gt;\s?(.*)$/)))o.push({k:'q',h:inline(m[1])});
+ else if(l.trim()==='')o.push({k:'b'});
+ else o.push({k:'p',h:inline(l.trim())});});
+ var r=[];o.forEach(function(b){if(b.k==='b'&&(!r.length||r[r.length-1].k==='b'))return;r.push(b);});
+ while(r.length&&r[r.length-1].k==='b')r.pop();return r;}
+function G(){return GAPS[S.gap]||GAPS.rapat;}
+function htmlDoc(){var g=G(),sz=+S.size,base='font-family:\''+S.font+'\',Arial,sans-serif;font-size:'+sz+'pt;color:#000',
+ aft=(g.after/20)+'pt',P='margin:0cm 0cm '+aft+' 0cm;mso-margin-top-alt:0cm;mso-margin-bottom-alt:0cm;line-height:'+(g.line/240).toFixed(2)+';'+base,
+ B='margin:0cm;mso-margin-top-alt:0cm;mso-margin-bottom-alt:0cm;line-height:'+(g.blank/20)+'pt;mso-line-height-rule:exactly;font-size:'+(g.blank/20)+'pt',h='';
+ h+='<p style="'+P+';text-align:center;font-size:'+(sz+3)+'pt"><b>'+esc(S.title)+'</b></p>';
+ if(S.sub)h+='<p style="'+P+';text-align:center">'+esc(S.sub)+'</p>';
+ h+='<p style="'+B+'">&nbsp;</p>';
+ S.reports.forEach(function(rt,ri){var bl=parse(rt),prev='',first=true;
+  bl.forEach(function(b){var pb=(first&&ri>0&&S.pb)?';page-break-before:always':'';first=false;
+   if(prev&&prev!==b.k&&(prev==='ul'||prev==='ol'))h+='</'+prev+'>';
+   if(b.k==='ul'||b.k==='ol'){if(prev!==b.k)h+='<'+b.k+' style="margin:0cm;padding-left:20pt'+pb+'">';h+='<li style="'+P+'">'+b.h+'</li>';}
+   else if(b.k==='q')h+='<p style="'+P+';margin-left:14pt'+pb+'">'+b.h+'</p>';
+   else if(b.k==='b')h+='<p style="'+B+'">&nbsp;</p>';
+   else h+='<p style="'+P+pb+'">'+b.h+'</p>';
+   prev=b.k;});
+  if(prev==='ul'||prev==='ol')h+='</'+prev+'>';
+  if(ri<S.reports.length-1&&!S.pb)for(var k=0;k<+S.sep;k++)h+='<p style="'+P+'">&nbsp;</p>';});
+ return h;}
+function xe(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function runs(h){var x='',b=0,i=0,s=0,m=0,re=/<(\/?)(span|b|i|s)(?=[\s>])([^>]*)>|([^<]+)/g,t;
+ while((t=re.exec(h))){if(t[4]!==undefined){var tx=t[4].replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+  x+='<w:r><w:rPr>'+(m?'<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:cs="Consolas"/>':'')+(b?'<w:b/>':'')+(i?'<w:i/>':'')+(s?'<w:strike/>':'')+'</w:rPr><w:t xml:space="preserve">'+xe(tx)+'</w:t></w:r>';}
+  else{var d=t[1]?-1:1;if(t[2]==='b')b+=d;else if(t[2]==='i')i+=d;else if(t[2]==='s')s+=d;else m+=d;}}
+ return x;}
+function buildDocx(){var g=G(),body='',nid=1,nums='';
+ function para(r,o){o=o||{};return '<w:p><w:pPr>'+(o.pb?'<w:pageBreakBefore/>':'')+(o.num?'<w:numPr><w:ilvl w:val="0"/><w:numId w:val="'+o.num+'"/></w:numPr>':'')+
+  '<w:spacing w:before="0" w:after="'+(o.after!=null?o.after:g.after)+'" w:line="'+(o.line||g.line)+'" w:lineRule="'+(o.rule||'auto')+'"/>'+(o.ind||'')+(o.jc?'<w:jc w:val="'+o.jc+'"/>':'')+'</w:pPr>'+r+'</w:p>';}
+ function blank(){return para('',{after:0,line:g.blank,rule:'exact'});}
+ body+=para('<w:r><w:rPr><w:b/><w:sz w:val="'+((+S.size+3)*2)+'"/></w:rPr><w:t xml:space="preserve">'+xe(S.title)+'</w:t></w:r>',{jc:'center'});
+ if(S.sub)body+=para('<w:r><w:t xml:space="preserve">'+xe(S.sub)+'</w:t></w:r>',{jc:'center'});
+ body+=blank();
+ S.reports.forEach(function(rt,ri){var bl=parse(rt),prev='',first=true,num=0;
+  bl.forEach(function(b){var pb=first&&ri>0&&S.pb;first=false;
+   if(b.k==='ul')body+=para(runs(b.h),{num:1,pb:pb});
+   else if(b.k==='ol'){if(prev!=='ol'){nid++;nums+='<w:num w:numId="'+nid+'"><w:abstractNumId w:val="1"/><w:lvlOverride w:ilvl="0"><w:startOverride w:val="1"/></w:lvlOverride></w:num>';}
+    body+=para(runs(b.h),{num:nid,pb:pb});}
+   else if(b.k==='q')body+=para(runs(b.h),{ind:'<w:ind w:left="567"/>',pb:pb});
+   else if(b.k==='b')body+=blank();
+   else body+=para(runs(b.h),{pb:pb});
+   prev=b.k;});
+  if(ri<S.reports.length-1&&!S.pb)for(var k=0;k<+S.sep;k++)body+=para('',{after:0});});
+ var W='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',f=xe(S.font),z=new JSZip();
+ z.file('[Content_Types].xml',H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>');
+ z.file('_rels/.rels',H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+ z.file('word/_rels/document.xml.rels',H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>');
+ z.file('word/styles.xml',H+'<w:styles '+W+'><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="'+f+'" w:hAnsi="'+f+'" w:cs="'+f+'" w:eastAsia="'+f+'"/><w:sz w:val="'+(S.size*2)+'"/><w:szCs w:val="'+(S.size*2)+'"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style></w:styles>');
+ var lv=function(fmt,txt,font){return '<w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="'+fmt+'"/><w:lvlText w:val="'+txt+'"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="567" w:hanging="283"/></w:pPr>'+(font?'<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/></w:rPr>':'')+'</w:lvl>';};
+ z.file('word/numbering.xml',H+'<w:numbering '+W+'><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="singleLevel"/>'+lv('bullet','\u2022',1)+'</w:abstractNum><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="singleLevel"/>'+lv('decimal','%1.')+'</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num>'+nums+'</w:numbering>');
+ z.file('word/footer1.xml',H+'<w:ftr '+W+'><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>');
+ z.file('word/document.xml',H+'<w:document '+W+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>'+body+'<w:sectPr><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>');
+ return z.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});}
+function say(t){$('msg').textContent=t;}
+function titleOf(t){var l=t.split('\n').filter(function(x){return x.trim();})[0]||'(kosong)';l=l.replace(/[*_~`]/g,'').trim();return l.length>56?l.slice(0,55)+'…':l;}
+function renderList(){var h='';$('cnt').textContent=S.reports.length;$('cnt2').textContent=S.reports.length;
+ S.reports.forEach(function(t,i){var ed=editing[i];
+  h+='<div class="item"><div class="ih"><span class="num">'+(i+1)+'</span><b title="'+esc(titleOf(t))+'">'+esc(titleOf(t))+'</b>'+
+  '<button class="sm" data-a="up" data-i="'+i+'"'+(i?'':' disabled')+'>↑</button><button class="sm" data-a="dn" data-i="'+i+'"'+(i<S.reports.length-1?'':' disabled')+'>↓</button>'+
+  '<button class="sm" data-a="ed" data-i="'+i+'">'+(ed?'Selesai':'Ubah')+'</button><button class="sm" data-a="del" data-i="'+i+'">Hapus</button></div>'+
+  (ed?'<textarea data-i="'+i+'">'+esc(t)+'</textarea>':'')+'</div>';});
+ $('list').innerHTML=h||'<div class="hint">Belum ada laporan.</div>';}
+function renderPaper(){$('paper').innerHTML=S.reports.length?htmlDoc():'';}
+function refresh(l){if(l)renderList();renderPaper();save();}
+$('list').addEventListener('click',function(e){var a=e.target.getAttribute&&e.target.getAttribute('data-a');if(!a)return;var i=+e.target.getAttribute('data-i'),R=S.reports;
+ if(a==='del'){R.splice(i,1);editing={};}
+ else if(a==='ed'){editing[i]=!editing[i];}
+ else{var j=a==='up'?i-1:i+1;var t=R[i];R[i]=R[j];R[j]=t;editing={};}
+ refresh(1);});
+$('list').addEventListener('input',function(e){if(e.target.tagName==='TEXTAREA'){S.reports[+e.target.getAttribute('data-i')]=e.target.value;renderPaper();save();}});
+function addNow(){var v=$('inp').value;if(!v.trim()){say('Tempel dulu laporannya di kotak.');return;}
+ var parts=v.split(/\n[ \t]*(?:-{3,}|={3,})[ \t]*\n/).map(function(x){return x.replace(/^\s*\n|\s+$/g,'');}).filter(function(x){return x.trim();});
+ var bad=false;parts.forEach(function(p){S.reports.push(p);if(/[*~]/.test(parse(p).map(function(b){return (b.h||'').replace(/<[^>]*>/g,'');}).join(' ')))bad=true;});$('inp').value='';say((parts.length>1?parts.length+' laporan masuk.':'Laporan ke-'+S.reports.length+' masuk \u2713')+(bad?' Perhatian: masih ada tanda * atau ~ yang tidak terbaca sebagai format, cek di pratinjau.':''));refresh(1);
+ var pp=$('paper');pp.scrollTop=pp.scrollHeight;}
+$('add').onclick=addNow;
+$('inp').addEventListener('paste',function(){setTimeout(addNow,50);});
+$('undo').onclick=function(){if(!S.reports.length)return;S.reports.pop();editing={};say('Laporan terakhir dibatalkan.');refresh(1);};
+$('demo').onclick=function(){$('inp').value='*M. POLSEK UMBULHARJO*\n- Lokasi:\n1. Nihil.\n- Barang Bukti: Nihil\n\n---\n*N. POLSEK KOTAGEDE*\n- Lokasi:\n1. Jl Retno Dumilah, Rejowinangun, Kotagede, Yogyakarta.\n- Barang Bukti: Nihil\n\nDokumentasi terlampir';};
+var cf=0;$('clr').onclick=function(){if(!cf){cf=1;$('clr').textContent='Yakin? Klik lagi';setTimeout(function(){cf=0;$('clr').textContent='Kosongkan semua';},3000);return;}
+ cf=0;S.reports=[];editing={};$('clr').textContent='Kosongkan semua';say('Semua laporan dihapus.');refresh(1);};
+[['title','title'],['date','sub']].forEach(function(p){$(p[0]).addEventListener('input',function(){S[p[1]]=this.value;refresh();});});
+['font','size','gap','sep'].forEach(function(k){$(k).addEventListener('change',function(){S[k]=this.value;refresh();});});
+$('pb').addEventListener('change',function(){S.pb=this.checked;refresh();});
+$('title').value=S.title;$('date').value=S.sub;$('font').value=S.font;$('size').value=S.size;$('gap').value=S.gap;$('sep').value=S.sep;$('pb').checked=!!S.pb;
+$('dl').onclick=function(){if(!S.reports.length){say('Tambahkan minimal satu laporan.');return;}
+ buildDocx().then(function(blob){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Laporan Harian - '+(S.sub||'').replace(/[\\\/:*?"<>|,]/g,'').trim()+'.docx';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);say('File .docx diunduh. Cek folder Downloads.');}).catch(function(){say('Gagal membuat file Word.');});};
+$('cp').onclick=function(){if(!S.reports.length){say('Tambahkan minimal satu laporan.');return;}
+ var html='<html><body><!--StartFragment-->'+htmlDoc()+'<!--EndFragment--></body></html>',plain=$('paper').innerText,ok='Tersalin! Buka Word lalu tekan Ctrl+V.';
+ var hd=function(e){e.preventDefault();e.clipboardData.setData('text/html',html);e.clipboardData.setData('text/plain',plain);};
+ document.addEventListener('copy',hd);var r=document.createRange();r.selectNodeContents($('paper'));var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+ var done=false;try{done=document.execCommand('copy');}catch(e){}document.removeEventListener('copy',hd);
+ say(done?ok:'Gagal menyalin otomatis. Blok pratinjau lalu tekan Ctrl+C.');};
+renderList();renderPaper();
+})();
+</script>
+</body>
+</html>
